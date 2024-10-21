@@ -1,11 +1,12 @@
-const express = require("express");
-const ProductManager = require("./ProductManager");
-const path = require("path");
+import express from "express";
+import ProductManager from "./ProductManager.js";
+import path from "path";
+import { fileURLToPath } from "url";
 
 const app = express();
 const PORT = 8080;
 
-const productsPath = path.join(__dirname, "data", "products.json");
+const productsPath = path.join( path.dirname(fileURLToPath(import.meta.url)), 'data',"products.json");
 const productManager = new ProductManager(productsPath);
 
 app.get("/products", async (req, res) => {
