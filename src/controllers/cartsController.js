@@ -40,7 +40,7 @@ export const createCart = async (req, res) => {
 
 export const addProduct = async (req, res) => {
   try {
-    const { cartId, productId } = req.params;
+    const { cid:cartId, pid:productId } = req.params;
 
     if (!cartId || !productId) {
       res.status(400).json({ error: "CartId and productId are required" });
