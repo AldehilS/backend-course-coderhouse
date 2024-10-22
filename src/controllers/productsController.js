@@ -2,7 +2,7 @@ import ProductManager from "../models/ProductManager.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const productsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), 'data', "products.json");
+const productsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..','data', "products.json");
 const productManager = new ProductManager(productsPath);
 
 export const getProducts = async (req, res) => {
