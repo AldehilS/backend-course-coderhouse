@@ -50,5 +50,85 @@
         "stock": 30,
         "category": "Furniture",
         "thumbnails": []
+    },
+    {
+        "id": 5,
+        "title": "4K TV",
+        "description": "Ultra HD Smart TV with vibrant colors",
+        "code": "TV2024",
+        "price": 499.99,
+        "status": true,
+        "stock": 45,
+        "category": "Electronics",
+        "thumbnails": [
+            "images/tv1.png",
+            "images/tv2.png"
+        ]
+    },
+    {
+        "id": 6,
+        "title": "Bluetooth Speaker",
+        "description": "Portable speaker with deep bass",
+        "code": "BS2024",
+        "price": 79.99,
+        "status": true,
+        "stock": 150,
+        "category": "Accessories",
+        "thumbnails": [
+            "images/speaker1.png"
+        ]
+    },
+    {
+        "id": 7,
+        "title": "Gaming Console",
+        "description": "Next-gen console with immersive graphics",
+        "code": "GC2024",
+        "price": 499.99,
+        "status": true,
+        "stock": 20,
+        "category": "Electronics",
+        "thumbnails": [
+            "images/console1.png",
+            "images/console2.png"
+        ]
+    },
+    {
+        "id": 8,
+        "title": "Smartwatch",
+        "description": "Fitness smartwatch with heart rate monitor",
+        "code": "SW2024",
+        "price": 199.99,
+        "status": true,
+        "stock": 75,
+        "category": "Accessories",
+        "thumbnails": [
+            "images/smartwatch1.png"
+        ]
+    },
+    {
+        "id": 9,
+        "title": "Wireless Keyboard",
+        "description": "Slim keyboard with backlit keys",
+        "code": "WK2024",
+        "price": 59.99,
+        "status": true,
+        "stock": 100,
+        "category": "Computers",
+        "thumbnails": [
+            "images/keyboard1.png"
+        ]
+    },
+    {
+        "id": 10,
+        "title": "HD Webcam",
+        "description": "1080p webcam with built-in microphone",
+        "code": "WC2024",
+        "price": 39.99,
+        "status": true,
+        "stock": 120,
+        "category": "Accessories",
+        "thumbnails": [
+            "images/webcam1.png"
+        ]
     }
 ]
