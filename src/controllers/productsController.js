@@ -2,7 +2,12 @@ import ProductManager from "../models/ProductManager.js";
 import path from "path";
 import { fileURLToPath } from "url";
 
-const productsPath = path.join(path.dirname(fileURLToPath(import.meta.url)), '..', 'data', "products.json");
+const productsPath = path.join(
+  path.dirname(fileURLToPath(import.meta.url)),
+  "..",
+  "data",
+  "products.json"
+);
 const productManager = new ProductManager(productsPath);
 
 function validateField(value, type) {
@@ -28,7 +33,7 @@ export const getProducts = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error getting products" });
   }
-}
+};
 
 export const getProductById = async (req, res) => {
   const { pid: id } = req.params;
@@ -42,14 +47,12 @@ export const getProductById = async (req, res) => {
     } else {
       res.json(product);
     }
-
   } catch (error) {
     res.status(500).json({ error: "Error getting product by id" });
   }
-}
+};
 
 export const addProduct = async (req, res) => {
-
   const { title, description, code, price, stock, category } = req.body;
   let { thumbnails, status } = req.body;
 
@@ -60,7 +63,11 @@ export const addProduct = async (req, res) => {
   }
 
   // Validate that all fields are of the correct type
-  if (!Object.keys({ title, description, code, price, stock, category }).every(key => validateField(req.body[key], fieldSchema[key].type))) {
+  if (
+    !Object.keys({ title, description, code, price, stock, category }).every(
+      (key) => validateField(req.body[key], fieldSchema[key].type)
+    )
+  ) {
     res.status(400).json({ error: "Invalid fields" });
     return;
   }
@@ -72,7 +79,10 @@ export const addProduct = async (req, res) => {
   thumbnails = thumbnails ? thumbnails : [];
 
   // Validate that all thumbnails are of the correct type
-  if (!Array.isArray(thumbnails) || !thumbnails.every(thumbnail => typeof thumbnail === "string")) {
+  if (
+    !Array.isArray(thumbnails) ||
+    !thumbnails.every((thumbnail) => typeof thumbnail === "string")
+  ) {
     res.status(400).json({ error: "Invalid thumbnails" });
     return;
   }
@@ -83,12 +93,20 @@ export const addProduct = async (req, res) => {
     return;
   }
 
-  const newProduct = { title, description, code, price, stock, category, thumbnails, status };
+  const newProduct = {
+    title,
+    description,
+    code,
+    price,
+    stock,
+    category,
+    thumbnails,
+    status,
+  };
   try {
-
     // Validate that the code is unique
     const products = await productManager.getProducts();
-    if (products.some(product => product.code === code)) {
+    if (products.some((product) => product.code === code)) {
       res.status(400).json({ error: "Code already exists" });
       return;
     }
@@ -98,22 +116,35 @@ export const addProduct = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error adding product" });
   }
-
-}
+};
 
 export const updateProduct = async (req, res) => {
   const { pid: id } = req.params;
   const newFields = req.body;
 
-  const validFields = ["title", "description", "code", "price", "stock", "category", "thumbnails", "status"];
+  const validFields = [
+    "title",
+    "description",
+    "code",
+    "price",
+    "stock",
+    "category",
+    "thumbnails",
+    "status",
+  ];
 
   // Delete fields that are not valid
-  Array.from(Object.keys(newFields)).forEach(key => { if (!validFields.includes(key)) delete newFields[key] });
+  Array.from(Object.keys(newFields)).forEach((key) => {
+    if (!validFields.includes(key)) delete newFields[key];
+  });
 
   // for each new field, validate that it is either undefined or of the correct type, if the field is thumbnails, validate that all thumbnails are of the correct type
   for (const [key, value] of Object.entries(newFields)) {
-    if (key === 'thumbnails') {
-      if (!Array.isArray(value) || !value.every(thumbnail => typeof thumbnail === "string")) {
+    if (key === "thumbnails") {
+      if (
+        !Array.isArray(value) ||
+        !value.every((thumbnail) => typeof thumbnail === "string")
+      ) {
         res.status(400).json({ error: "Invalid thumbnails" });
         return;
       }
@@ -123,7 +154,6 @@ export const updateProduct = async (req, res) => {
         return;
       }
     }
-
   }
 
   try {
@@ -136,11 +166,10 @@ export const updateProduct = async (req, res) => {
 
     await productManager.updateProduct(id, newFields);
     res.json({ message: "Product updated successfully" });
-
   } catch (error) {
     res.status(500).json({ error: "Error updating product" });
   }
-}
+};
 
 export const deleteProduct = async (req, res) => {
   const { pid: id } = req.params;
@@ -159,4 +188,4 @@ export const deleteProduct = async (req, res) => {
   } catch (error) {
     res.status(500).json({ error: "Error deleting product" });
   }
-}
+};
