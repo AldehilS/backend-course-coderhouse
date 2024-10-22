@@ -80,7 +80,12 @@ export const getCart = async (req, res) => {
       return;
     }
 
-    const cart = await cartManager.getCart(cartId);
+    const cart = await cartManager.getCart(Number(cartId));
+
+    if (!cart) {
+      res.status(404).json({ error: "Cart not found" });
+      return;
+    }
 
     res.json(cart);
   } catch (error) {

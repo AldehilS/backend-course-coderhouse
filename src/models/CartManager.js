@@ -82,9 +82,7 @@ export default class CartManager {
         carts = JSON.parse(carts);
       }
 
-      const cart = carts.find((cart) => {
-        cart.id === cartId;
-      });
+      const cart = carts.find((cart) =>  cart.id === cartId);
 
       if (!cart) {
         console.error("Cart not found");
