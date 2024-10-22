@@ -117,12 +117,13 @@ export const updateProduct = async (req, res) => {
         res.status(400).json({ error: "Invalid thumbnails" });
         return;
       }
+    } else {
+      if (value !== undefined && !validateField(value, fieldSchema[key].type)) {
+        res.status(400).json({ error: "Invalid fields" });
+        return;
+      }
     }
 
-    if (value !== undefined && !validateField(value, fieldSchema[key].type)) {
-      res.status(400).json({ error: "Invalid fields" });
-      return;
-    }
   }
 
   try {
