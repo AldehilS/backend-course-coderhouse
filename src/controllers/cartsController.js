@@ -52,11 +52,39 @@ export const addProduct = async (req, res) => {
       return;
     }
 
-    const id = await cartManager.addProduct(cartId, productId);
+    const productAdded = await cartManager.addProduct(cartId, productId);
 
-    res.json({ id: id, message: "Product added to cart succesfully" });
+    if (!productAdded) {
+      res.status(404).json({ error: "Cart not found" });
+      return;
+    }
+
+    res.json({ message: "Product added to cart succesfully" });
   } catch (error) {
     console.error(error);
     res.status(500).json({ error: 'Error adding product to cart' });
   }
-}
+};
+
+export const getCart = async (req, res) => {
+  try {
+    const { cid:cartId } = req.params;
+
+    if (!cartId) {
+      res.status(400).json({ error: "CartId is required" });
+      return;
+    }
+
+    if (isNaN(Number(cartId))) {
+      res.status(400).json({ error: "CartId must be a number" });
+      return;
+    }
+
+    const cart = await cartManager.getCart(cartId);
+
+    res.json(cart);
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: 'Error getting cart' });
+  }
+};

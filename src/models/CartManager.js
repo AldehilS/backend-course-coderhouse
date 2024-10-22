@@ -26,7 +26,7 @@ export default class CartManager {
       return id;
     } catch (error) {
       console.error(error);
-      throw new Error("Error creating cart");
+      throw error;
     }
   }
 
@@ -45,7 +45,8 @@ export default class CartManager {
       });
 
       if (!cart) {
-        throw new Error("Cart not found");
+        console.error("Cart not found");
+        return;
       }
 
       const { products } = cart.products;
@@ -63,6 +64,38 @@ export default class CartManager {
 
       await fs.promises.writeFile(this.path, JSON.stringify(carts, null, 4));
 
-    } catch (error) {}
+      return true;
+
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
+  }
+
+  async getCart(cartId) {
+    try {
+      let carts = await fs.promises.readFile(this.path, "utf-8");
+
+      if (carts.length === 0) {
+        carts = [];
+      } else {
+        carts = JSON.parse(carts);
+      }
+
+      const cart = carts.find((cart) => {
+        cart.id === cartId;
+      });
+
+      if (!cart) {
+        console.error("Cart not found");
+        return;
+      }
+
+      return cart;
+
+    } catch (error) {
+      console.error(error);
+      throw error;
+    }
   }
 }
