@@ -141,3 +141,22 @@ export const updateProduct = async (req, res) => {
     res.status(500).json({ error: "Error updating product" });
   }
 }
+
+export const deleteProduct = async (req, res) => {
+  const { pid: id } = req.params;
+
+  try {
+    const product = await productManager.getProductById(id);
+
+    if (!product) {
+      res.status(404).json({ error: "Product not found" });
+      return;
+    }
+
+    await productManager.deleteProduct(id);
+
+    res.json({ message: "Product deleted successfully" });
+  } catch (error) {
+    res.status(500).json({ error: "Error deleting product" });
+  }
+}

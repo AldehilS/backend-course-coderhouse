@@ -68,4 +68,25 @@ export default class ProductManager {
       throw error;
     }
   }
+
+  async deleteProduct(id) {
+    try {
+      const products = await this.getProducts();
+      const productIndex = products.findIndex((product) => product.id == id);
+
+      if (productIndex === -1) {
+        console.error("Product not found");
+        return;
+      }
+
+      products.splice(productIndex, 1);
+
+      await fs.promises.writeFile(this.path, JSON.stringify(products, null, 4));
+
+      return;
+    } catch (error) {
+      console.error("Error deleting product", error);
+      throw error;
+    }
+  }
 }

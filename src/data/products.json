@@ -50,16 +50,5 @@
         "stock": 30,
         "category": "Furniture",
         "thumbnails": []
-    },
-    {
-        "id": 5,
-        "title": "Gaming Mouse",
-        "description": "Ergonomic gaming mouse with RGB lighting",
-        "code": "GM2024",
-        "price": 49.99,
-        "status": true,
-        "stock": 300,
-        "category": "Accessories",
-        "thumbnails": []
     }
 ]
