@@ -40,21 +40,17 @@ export default class CartManager {
         carts = JSON.parse(carts);
       }
 
-      const cart = carts.find((cart) => {
-        cart.id === cartId;
-      });
+      const cart = carts.find((cart) => cart.id === cartId);
 
       if (!cart) {
         console.error("Cart not found");
         return;
       }
 
-      const { products } = cart.products;
+      const products = cart.products;
 
       // Check if product is already in cart
-      const product = products.find((product) => {
-        product.id === productId;
-      });
+      const product = products.find((product) => product.id === productId);
 
       if (product) {
         product.quantity++;

@@ -52,7 +52,7 @@ export const addProduct = async (req, res) => {
       return;
     }
 
-    const productAdded = await cartManager.addProduct(cartId, productId);
+    const productAdded = await cartManager.addProduct(Number(cartId), Number(productId));
 
     if (!productAdded) {
       res.status(404).json({ error: "Cart not found" });
