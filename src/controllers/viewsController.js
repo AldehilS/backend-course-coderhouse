@@ -18,3 +18,7 @@ export const getHome = async (req, res) => {
     res.status(500).json({ error: "Error getting products" });
   }
 };
+
+export const getRealTimeProducts = (req,res) => {
+  res.render('realTimeProducts');
+}
