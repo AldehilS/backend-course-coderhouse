@@ -39,4 +39,18 @@ io.on('connection', async (socket) => {
   } catch (error) {
     console.error('Error getting products', error);
   }
+
+  socket.on('new-product', async (product) => {
+    try {
+      const { title, description, code, price, stock, category } = product;
+      let { thumbnails, status } = product;
+
+      // await productManager.addProduct(product);
+      // const products = await productManager.getProducts();
+      // socket.broadcast.emit('products', products);
+      console.log('New product:', product);
+    } catch (error) {
+      console.error('Error adding product', error);
+    }
+  });
 });
