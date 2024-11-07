@@ -1,6 +1,7 @@
 const socket = io();
 const productsList = document.getElementById('products-list');
 const addProductForm = document.getElementById('product-add');
+const deleteProductForm = document.getElementById('product-delete');
 
 socket.on('products', products => {
     productsList.innerHTML = '';
@@ -39,4 +40,11 @@ addProductForm.addEventListener('submit', event => {
     console.log(product);
 
     socket.emit('new-product', product);
+});
+
+deleteProductForm.addEventListener('submit', event => {
+    event.preventDefault();
+
+    const id = document.getElementById('delete-id').value;
+    socket.emit('delete-product', Number(id));
 });

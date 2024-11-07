@@ -130,16 +130,5 @@
         "thumbnails": [
             "images/webcam1.png"
         ]
-    },
-    {
-        "id": 11,
-        "title": "Prueba2",
-        "description": "daojdoefsef",
-        "code": "adeoa",
-        "price": 32,
-        "status": true,
-        "stock": 5,
-        "category": "padoawd",
-        "thumbnails": []
     }
 ]

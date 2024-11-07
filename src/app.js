@@ -122,4 +122,21 @@ io.on("connection", async (socket) => {
       socket.emit("error", { error: "Error adding product" });
     }
   });
+
+  socket.on("delete-product", async (id) => {
+    try {
+      const product = await productManager.getProductById(id);
+  
+      if (!product) {
+        socket.emit("error", { error: "Product not found" });
+        return;
+      }
+  
+      await productManager.deleteProduct(id);
+  
+      io.emit("products", await productManager.getProducts());
+    } catch (error) {
+      socket.emit("error", { error: "Error deleting product" });
+    }
+  });
 });
