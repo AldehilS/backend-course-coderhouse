@@ -10,11 +10,11 @@ const productsPath = path.join(
 );
 const productManager = new ProductManager(productsPath);
 
-function validateField(value, type) {
+export function validateField(value, type) {
   return typeof value === type;
 }
 
-const fieldSchema = {
+export const fieldSchema = {
   title: { type: "string" },
   description: { type: "string" },
   code: { type: "string" },

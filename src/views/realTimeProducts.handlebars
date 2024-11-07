@@ -8,8 +8,18 @@
 <div>
   <h2>Agregar un producto nuevo</h2>
   <form id="product-add">
-    <input type="text" name="title" id="title" placeholder="Titulo del producto" />
-    <input type="text" name="price" id="price" placeholder="Precio del producto" />
+    <label for="title">Title:</label>
+    <input type="text" name="title" id="title" placeholder="Product title" />
+    <label for="description">Description:</label>
+    <input type="text" name="description" id="description" placeholder="Product description">
+    <label for="code">Code:</label>
+    <input type="text" name="code" id="code" placeholder="Product code" />
+    <label for="price">Price:</label>
+    <input type="number" name="price" id="price" placeholder="Product price" />
+    <label for="stock">Stock:</label>
+    <input type="number" name="stock" id="stock" placeholder="Product stock">
+    <label for="category">Category:</label>
+    <input type="text" name="category" id="category" placeholder="Product category" />
     <button type="submit">Agregar producto</button>
   </form>
 </div>

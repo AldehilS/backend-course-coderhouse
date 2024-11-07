@@ -11,15 +11,32 @@ socket.on('products', products => {
     });
 })
 
+socket.on('error', error => {
+    alert(error.error);
+});
+
 addProductForm.addEventListener('submit', event => {
     event.preventDefault();
 
     console.log('Form submitted');
 
     const title = document.getElementById('title').value;
-    const description = document.getElementById('price').value;
+    const description = document.getElementById('description').value;
+    const code = document.getElementById('code').value;
+    let price = document.getElementById('price').value;
+    let stock = document.getElementById('stock').value;
+    const category = document.getElementById('category').value;
 
-    const product = { title, description };
+    try {
+        price = Number(price);
+        stock = Number(stock);
+    } catch (error) {
+        alert('Price and stock must be numbers');
+        return;
+    }
+
+    const product = { title, description, code, price, stock, category };
+    console.log(product);
 
     socket.emit('new-product', product);
 });
