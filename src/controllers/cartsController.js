@@ -1,4 +1,4 @@
-import CartManager from "../models/CartManager.js";
+import CartManager from "../dao/CartManager.js";
 import path from 'path'
 import { fileURLToPath } from "url";
 

@@ -1,4 +1,4 @@
-import ProductManager from "../models/ProductManager.js";
+import ProductManager from "../dao/ProductManager.js";
 import path from "path";
 import { fileURLToPath } from "url";
 

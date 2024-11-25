@@ -6,15 +6,16 @@ import path from "path";
 import { fileURLToPath } from "url";
 import viewsRouter from "./routes/viewsRouter.js";
 import { Server } from "socket.io";
-import ProductManager from "./models/ProductManager.js";
-import { error } from "console";
+import ProductManager from "./dao/ProductManager.js";
 import {
   fieldSchema,
   validateField,
 } from "./controllers/productsController.js";
+import dbConnection from "./dbConnection.js";
+import { config } from "./config/config.js";
 
 const app = express();
-const PORT = 8080;
+const PORT = config.port;
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 app.engine("handlebars", handlebars.engine());
@@ -29,6 +30,8 @@ app.use(express.static(path.join(__dirname, "public")));
 
 const productsPath = path.join(__dirname, "data", "products.json");
 const productManager = new ProductManager(productsPath);
+
+dbConnection(config.db.host, config.db.database);
 
 const httpServer = app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
