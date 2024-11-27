@@ -1,14 +1,4 @@
-import ProductManager from "../dao/ProductManager.js";
-import path from "path";
-import { fileURLToPath } from "url";
-
-const productsPath = path.join(
-  path.dirname(fileURLToPath(import.meta.url)),
-  "..",
-  "data",
-  "products.json"
-);
-const productManager = new ProductManager(productsPath);
+import productManager from "../dao/ProductMongoManager.js";
 
 export function validateField(value, type) {
   return typeof value === type;
@@ -26,12 +16,81 @@ export const fieldSchema = {
 };
 
 export const getProducts = async (req, res) => {
-  const limit = req.query.limit;
+  let { limit, page, query, sort } = req.query;
   try {
-    const products = await productManager.getProducts();
-    res.json(products.slice(0, limit ? limit : products.length));
+    if (!limit) {
+      limit = 10;
+    }
+
+    if (!page) {
+      page = 1;
+    }
+
+    if (!sort) {
+      sort = null;
+    }
+
+    if (sort !== null && sort !== "asc" && sort !== "desc") {
+      res.status(400).json({ error: "Invalid sort value" });
+      return;
+    }
+
+    if (query) {
+      try {
+        query = JSON.parse(query);
+      } catch (error) {
+        res.status(400).json({ status: "error", error: "Invalid query" });
+        return;
+      }
+    } else {
+      query = {};
+    }
+
+    let priceSort = {};
+    if (sort === "asc") {
+      priceSort = { price: 1 };
+    } else if (sort === "desc") {
+      priceSort = { price: -1 };
+    }
+
+    const mongoProducts = await productManager.getProducts(limit, page, priceSort, query);
+
+    /**
+     * Convert the products to the format that the frontend expects
+     * With the following format:
+     * {
+	        status:success/error
+          payload: Resultado de los productos solicitados
+          totalPages: Total de páginas
+          prevPage: Página anterior
+          nextPage: Página siguiente
+          page: Página actual
+          hasPrevPage: Indicador para saber si la página previa existe
+          hasNextPage: Indicador para saber si la página siguiente existe.
+          prevLink: Link directo a la página previa (null si hasPrevPage=false)
+          nextLink: Link directo a la página siguiente (null si hasNextPage=false)
+      }
+    */
+    const products = {
+      status: "success",
+      payload: mongoProducts.docs,
+      totalPages: mongoProducts.totalPages,
+      prevPage: mongoProducts.prevPage,
+      nextPage: mongoProducts.nextPage,
+      page: mongoProducts.page,
+      hasPrevPage: mongoProducts.hasPrevPage,
+      hasNextPage: mongoProducts.hasNextPage,
+      prevLink: mongoProducts.hasPrevPage
+        ? `/products?limit=${limit}&page=${mongoProducts.prevPage}`
+        : null,
+      nextLink: mongoProducts.hasNextPage
+        ? `/products?limit=${limit}&page=${mongoProducts.nextPage}`
+        : null,
+    };
+
+    res.json(products);
   } catch (error) {
-    res.status(500).json({ error: "Error getting products" });
+    res.status(500).json({ status: "error", error: "Error getting products" });
   }
 };
 
@@ -57,18 +116,19 @@ export const addProduct = async (req, res) => {
   let { thumbnails, status } = req.body;
 
   // Validate that all fields exists. thumbnails and status are optional
-  if (!title || !description || !code || !price || !stock || !category) {
-    res.status(400).json({ error: "Missing fields" });
-    return;
-  }
+  const missingFields = [];
 
-  // Validate that all fields are of the correct type
-  if (
-    !Object.keys({ title, description, code, price, stock, category }).every(
-      (key) => validateField(req.body[key], fieldSchema[key].type)
-    )
-  ) {
-    res.status(400).json({ error: "Invalid fields" });
+  if (!title) missingFields.push("title");
+  if (!description) missingFields.push("description");
+  if (!code) missingFields.push("code");
+  if (!price) missingFields.push("price");
+  if (!stock) missingFields.push("stock");
+  if (!category) missingFields.push("category");
+
+  if (missingFields.length > 0) {
+    res
+      .status(400)
+      .json({ error: `Missing fields: ${missingFields.join(", ")}` });
     return;
   }
 
@@ -77,21 +137,6 @@ export const addProduct = async (req, res) => {
 
   // thumbnails is and optional field
   thumbnails = thumbnails ? thumbnails : [];
-
-  // Validate that all thumbnails are of the correct type
-  if (
-    !Array.isArray(thumbnails) ||
-    !thumbnails.every((thumbnail) => typeof thumbnail === "string")
-  ) {
-    res.status(400).json({ error: "Invalid thumbnails" });
-    return;
-  }
-
-  // Validate that status is of the correct type
-  if (!validateField(status, fieldSchema.status.type)) {
-    res.status(400).json({ error: "Invalid status" });
-    return;
-  }
 
   const newProduct = {
     title,
@@ -104,57 +149,21 @@ export const addProduct = async (req, res) => {
     status,
   };
   try {
-    // Validate that the code is unique
-    const products = await productManager.getProducts();
-    if (products.some((product) => product.code === code)) {
-      res.status(400).json({ error: "Code already exists" });
-      return;
-    }
-
-    const productId = await productManager.addProduct(newProduct);
-    res.json({ id: productId, message: "Product added successfully" });
+    const addedProduct = await productManager.addProduct(newProduct);
+    res.json({
+      addedProduct: addedProduct,
+      message: "Product added successfully",
+    });
   } catch (error) {
-    res.status(500).json({ error: "Error adding product" });
+    res
+      .status(500)
+      .json({ error: "Error adding product", detail: error.message });
   }
 };
 
 export const updateProduct = async (req, res) => {
   const { pid: id } = req.params;
   const newFields = req.body;
-
-  const validFields = [
-    "title",
-    "description",
-    "code",
-    "price",
-    "stock",
-    "category",
-    "thumbnails",
-    "status",
-  ];
-
-  // Delete fields that are not valid
-  Array.from(Object.keys(newFields)).forEach((key) => {
-    if (!validFields.includes(key)) delete newFields[key];
-  });
-
-  // for each new field, validate that it is either undefined or of the correct type, if the field is thumbnails, validate that all thumbnails are of the correct type
-  for (const [key, value] of Object.entries(newFields)) {
-    if (key === "thumbnails") {
-      if (
-        !Array.isArray(value) ||
-        !value.every((thumbnail) => typeof thumbnail === "string")
-      ) {
-        res.status(400).json({ error: "Invalid thumbnails" });
-        return;
-      }
-    } else {
-      if (value !== undefined && !validateField(value, fieldSchema[key].type)) {
-        res.status(400).json({ error: "Invalid fields" });
-        return;
-      }
-    }
-  }
 
   try {
     const product = await productManager.getProductById(id);
@@ -165,9 +174,10 @@ export const updateProduct = async (req, res) => {
     }
 
     await productManager.updateProduct(id, newFields);
-    res.json({ message: "Product updated successfully" });
+    const updatedProduct = await productManager.getProductById(id);
+    res.json({ message: "Product updated successfully", updatedProduct: updatedProduct });
   } catch (error) {
-    res.status(500).json({ error: "Error updating product" });
+    res.status(500).json({ error: "Error updating product", detail: error.message });
   }
 };
 
@@ -182,9 +192,9 @@ export const deleteProduct = async (req, res) => {
       return;
     }
 
-    await productManager.deleteProduct(id);
+    const deletedProduct = await productManager.deleteProduct(id);
 
-    res.json({ message: "Product deleted successfully" });
+    res.json({ message: "Product deleted successfully", deleteProduct: deletedProduct });
   } catch (error) {
     res.status(500).json({ error: "Error deleting product" });
   }
